@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GEAP Dashboard</title>
+</head>
+<body>
+    <h1>GEAP Governance Dashboard</h1>
+    <table border="1">
+        <tr>
+            <th>Gate Name</th>
+            <th>Status</th>
+            <th>Description</th>
+        </tr>
+        {% for name, success, desc in gates %}
+        <tr>
+            <td>{{ name }}</td>
+            <td>{{ success }}</td>
+            <td>{{ desc }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'download-report' %}">Download Conformity Report (JSON)</a>
+</body>
+</html>
