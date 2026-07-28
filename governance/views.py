@@ -21,42 +21,42 @@ def run_data_gate(request, loan_amount, age):
     return HttpResponse(f"Gate Result: {status}")
 
 def run_governance_gates(request):
-    # അപേക്ഷകന്റെ ഡാറ്റയും മോഡലിന്റെ മെട്രിക്സും (ഇവിടെ വാല്യൂസ് മാറ്റി നിങ്ങൾക്ക് ടെസ്റ്റ് ചെയ്യാം)
+    
     applicant = {
         "name": "Test User", 
-        "age": 20,             # 18-ൽ കുറഞ്ഞാൽ Data Gate FAIL ആകും
-        "loan_amount": 50000   # 100000-ൽ കൂടിയാൽ Risk Gate FAIL ആകും
+        "age": 20,             
+        "loan_amount": 50000  
     }
     
     model_data = {
-        "is_reproducible": True,   # False ആയാൽ Train Gate FAIL ആകും
-        "accuracy_score": 0.85,    # 0.8-ൽ കുറഞ്ഞാൽ Validation Gate FAIL ആകും
+        "is_reproducible": True,   
+        "accuracy_score": 0.85,    
         "threshold": 0.80,
-        "bias_detected": False     # True ആയാൽ Output Gate FAIL ആകും
+        "bias_detected": False    
     }
     
-    # ഓരോ തവണ റൺ ചെയ്യുമ്പോഴും പഴയ ലോഗുകൾ ക്ലിയർ ചെയ്യാൻ
+   
     Evidence.objects.all().delete()
     
-    # 5 ഗേറ്റുകളുടെയും കൺട്രോൾ ലോജിക്
+    
     gates = [
-        # 1. Data Gate: പ്രായം പരിശോധിക്കുന്നു
+       
         ("Data Gate", applicant["age"] >= 18, f"Age verification: {applicant['age']} (Required >= 18)"),
         
-        # 2. Train Gate: മോഡൽ ആവർത്തിക്കാൻ കഴിയുന്നതാണോ എന്ന് നോക്കുന്നു
+        
         ("Train Gate", model_data["is_reproducible"], "Training parameters logged and reproducible"),
         
-        # 3. Validation Gate: അക്യുറസി ചെക്ക് ചെയ്യുന്നു
+        
         ("Validation Gate", model_data["accuracy_score"] >= model_data["threshold"], f"Model accuracy {model_data['accuracy_score']} >= {model_data['threshold']}"),
         
-        # 4. Risk Gate: ലോൺ തുക കംപ്ലയൻസിനുള്ളിലാണോ എന്ന് നോക്കുന്നു
+        
         ("Risk Gate", applicant["loan_amount"] <= 100000, f"Credit check: Loan amount {applicant['loan_amount']} <= 100000"),
         
-        # 5. Output Gate: ഔട്ട്‌പുട്ടിൽ പക്ഷപാതം (Bias) ഉണ്ടോ എന്ന് പരിശോധിക്കുന്നു
+        
         ("Output Gate", not model_data["bias_detected"], "Bias audit complete: No unfair bias detected")
     ]
     
-    # ഓരോ ഗേറ്റിന്റെയും ഫലം ഡാറ്റാബേസിലേക്ക് അയക്കുന്നു
+    
     for name, success, desc in gates:
         status = "PASS" if success else "FAIL"
         Evidence.objects.create(
@@ -66,7 +66,7 @@ def run_governance_gates(request):
             description=desc
         )
         
-    # ഡാറ്റാബേസിൽ നിന്നുള്ള ലോഗുകൾ ഡാഷ്‌ബോർഡിലേക്ക് അയക്കുന്നു
+    
     evidence_data = Evidence.objects.all().order_by('-timestamp')
 
     return render(request, 'governance/dashboard.html', {'gates': evidence_data})

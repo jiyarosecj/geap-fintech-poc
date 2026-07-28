@@ -11,13 +11,13 @@
             <th>Status</th>
             <th>Description</th>
         </tr>
-        {% for name, success, desc in gates %}
-        <tr>
-            <td>{{ name }}</td>
-            <td>{{ success }}</td>
-            <td>{{ desc }}</td>
-        </tr>
-        {% endfor %}
+       {% for gate in gates %} 
+<tr>
+    <td>{{ gate.gate_name }}</td>
+    <td>{{ gate.status }}</td>
+    <td>{{ gate.description }}</td>
+</tr>
+{% endfor %}
     </table>
     <a href="{% url 'download-report' %}">Download Conformity Report (JSON)</a>
 </body>
